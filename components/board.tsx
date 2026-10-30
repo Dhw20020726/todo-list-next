@@ -56,10 +56,10 @@ export default function Board({ tasks }: { tasks: Task[] }) {
   }
 
   return (
-    <div>
-      {isPending && <p className="text-sm text-gray-400 mb-2">保存中…</p>}
+    <div className="board">
+      {isPending && <p className="board__status">保存中…</p>}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="columns">
         {COLUMNS.map((col) => {
           const colTasks = tasks.filter((t) => t.status === col.id);
           const isOver = dragOverCol === col.id;
@@ -72,17 +72,19 @@ export default function Board({ tasks }: { tasks: Task[] }) {
                 setDragOverCol(col.id);
               }}
               onDrop={(e) => handleDrop(col.id, e)}
-              className={`rounded-lg p-4 min-h-[300px] transition-colors ${
-                isOver ? "bg-gray-200 ring-2 ring-blue-400" : "bg-gray-100"
+              className={`column column--${col.id}${
+                isOver ? " column--over" : ""
               }`}
             >
-              <h2 className="font-semibold mb-3">
-                {col.label}
-                <span className="ml-2 text-sm text-gray-500">
-                  {colTasks.length}
-                </span>
-              </h2>
-              <div className="space-y-2">
+              <header className="column__head">
+                <h2 className="column__title">
+                  <span className="column__dot" aria-hidden="true" />
+                  {col.label}
+                </h2>
+                <span className="column__count">{colTasks.length}</span>
+              </header>
+
+              <div className="column__body">
                 {colTasks.map((t) => (
                   <TaskCard
                     key={t.id}
@@ -101,7 +103,7 @@ export default function Board({ tasks }: { tasks: Task[] }) {
                   />
                 ))}
                 {colTasks.length === 0 && (
-                  <p className="text-sm text-gray-400">暂无任务</p>
+                  <p className="column__empty">拖拽任务到这里</p>
                 )}
               </div>
             </section>
@@ -110,12 +112,9 @@ export default function Board({ tasks }: { tasks: Task[] }) {
       </div>
 
       {undoTask && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-black text-white rounded-full px-4 py-2 shadow-lg flex items-center gap-3">
-          <span className="text-sm">已删除「{undoTask.title}」</span>
-          <button
-            onClick={handleUndo}
-            className="text-sm font-medium text-blue-300 hover:text-blue-200"
-          >
+        <div className="toast">
+          <span className="toast__text">已删除「{undoTask.title}」</span>
+          <button onClick={handleUndo} className="toast__undo">
             撤销
           </button>
         </div>

@@ -6,30 +6,35 @@ import Board from "@/components/board";
 
 export default function Home() {
   return (
-    <main className="p-8 max-w-5xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">任务看板</h1>
+    <main className="board-page">
+      <header className="page-head">
+        <h1 className="page-head__title">任务看板</h1>
+        <p className="page-head__sub">拖拽卡片，随时调整进度</p>
+      </header>
 
-      <form action={addTask} className="flex flex-wrap gap-2 mb-6">
+      <form action={addTask} className="composer">
         <input
           name="title"
           placeholder="任务标题"
           required
-          className="border border-gray-300 rounded px-3 py-1"
+          autoComplete="off"
+          className="composer__input composer__input--title"
         />
         <input
           name="description"
           placeholder="描述（可选）"
-          className="border border-gray-300 rounded px-3 py-1"
+          autoComplete="off"
+          className="composer__input composer__input--desc"
         />
         <button
           type="submit"
-          className="rounded bg-foreground px-4 py-1 text-background"
+          className="btn btn--primary composer__submit"
         >
-          添加
+          添加任务
         </button>
       </form>
 
-      <Suspense fallback={<p className="text-gray-400">加载中…</p>}>
+      <Suspense fallback={<p className="loading">加载中…</p>}>
         <BoardSection />
       </Suspense>
     </main>

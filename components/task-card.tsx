@@ -41,31 +41,28 @@ export default function TaskCard({
   // 编辑态：显示输入框 + 保存/取消
   if (editing) {
     return (
-      <article className="bg-white rounded border border-gray-300 p-3 shadow-sm">
+      <article className="card card--editing">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="任务标题"
           autoFocus
-          className="w-full border border-gray-300 rounded px-2 py-1 mb-2"
+          className="field"
         />
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="描述（可选）"
           rows={2}
-          className="w-full border border-gray-300 rounded px-2 py-1 mb-2"
+          className="field"
         />
-        <div className="flex gap-2">
-          <button
-            onClick={handleSave}
-            className="rounded bg-foreground px-3 py-1 text-sm text-background"
-          >
+        <div className="card__editor">
+          <button onClick={handleSave} className="btn btn--primary btn--sm">
             保存
           </button>
           <button
             onClick={() => setEditing(false)}
-            className="rounded border border-gray-300 px-3 py-1 text-sm"
+            className="btn btn--ghost btn--sm"
           >
             取消
           </button>
@@ -80,33 +77,29 @@ export default function TaskCard({
       draggable
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
-      className={`bg-white rounded border border-gray-200 p-3 shadow-sm ${
-        isDragging ? "opacity-50" : ""
-      }`}
+      className={`card${isDragging ? " card--dragging" : ""}`}
     >
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <h3 className="font-medium break-words">{task.title}</h3>
+      <div className="card__head">
+        <div className="card__body">
+          <h3 className="card__title">{task.title}</h3>
           {task.description && (
-            <p className="text-sm text-gray-500 mt-1 whitespace-pre-wrap">
-              {task.description}
-            </p>
+            <p className="card__desc">{task.description}</p>
           )}
         </div>
-        <div className="flex gap-1 shrink-0">
+        <div className="card__actions">
           <button
             onClick={() => {
               setTitle(task.title); // 进入编辑前，用当前值初始化草稿
               setDescription(task.description);
               setEditing(true);
             }}
-            className="text-sm text-gray-500 hover:text-black px-1"
+            className="card__action"
           >
             编辑
           </button>
           <button
             onClick={() => onDelete(task)}
-            className="text-sm text-gray-500 hover:text-red-600 px-1"
+            className="card__action card__action--danger"
           >
             删除
           </button>
