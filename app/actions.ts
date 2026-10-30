@@ -5,13 +5,14 @@ import {
   createTask,
   deleteTask,
   moveTask,
+  permanentlyDeleteTask,
   restoreTask,
   updateTask,
 } from "@/lib/store";
 import type { Status } from "@/lib/types";
 
 // 所有"改数据"的操作都集中在这个文件里。
-// 每个 action 做完事之后调用 revalidatePath，让 Next 在同一次请求里重新渲染页面。
+// 每个 action 做完事之后调用 revalidatePath，让 Next 在同一次请求里重新渲染相关页面。
 
 export async function addTask(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
@@ -24,7 +25,7 @@ export async function addTask(formData: FormData) {
 export async function removeTask(id: string) {
   await deleteTask(id);
   revalidatePath("/");
-  revalidatePath("/history");
+  revalidatePath("/trash");
 }
 
 export async function changeTaskStatus(id: string, status: Status) {
@@ -43,5 +44,11 @@ export async function editTask(
 export async function recoverTask(id: string) {
   await restoreTask(id);
   revalidatePath("/");
-  revalidatePath("/history");
+  revalidatePath("/trash");
+}
+
+export async function deleteTaskForever(id: string) {
+  await permanentlyDeleteTask(id);
+  revalidatePath("/");
+  revalidatePath("/trash");
 }

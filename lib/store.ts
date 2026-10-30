@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
-import type { LogEntry, LogType, Status, StoreData, Task } from "./types";
+import type { LogEntry, Status, StoreData, Task } from "./types";
 
 // 数据存在项目根目录下的 data/db.json 里（已加入 .gitignore）
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -40,6 +40,14 @@ export async function listLogs(since: number): Promise<LogEntry[]> {
   return store.logs
     .filter((l) => l.timestamp >= since)
     .sort((a, b) => b.timestamp - a.timestamp);
+}
+
+// 返回所有已删除的任务（回收站用），最近删除的在前
+export async function listDeletedTasks(): Promise<Task[]> {
+  const store = await readStore();
+  return store.tasks
+    .filter((t) => t.deletedAt !== null)
+    .sort((a, b) => (b.deletedAt ?? 0) - (a.deletedAt ?? 0));
 }
 
 // ---------- 变更（每次操作都会追加一条日志） ----------
@@ -154,4 +162,15 @@ export async function restoreTask(id: string): Promise<Task> {
   });
   await writeStore(store);
   return task;
+}
+
+// 彻底删除：从数组里真正移除，无法再找回（只能对已在回收站里的任务调用）
+export async function permanentlyDeleteTask(id: string): Promise<void> {
+  const store = await readStore();
+  const task = store.tasks.find((t) => t.id === id);
+  if (!task || task.deletedAt === null) {
+    throw new Error("只能彻底删除回收站里的任务");
+  }
+  store.tasks = store.tasks.filter((t) => t.id !== id);
+  await writeStore(store);
 }

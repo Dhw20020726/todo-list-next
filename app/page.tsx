@@ -1,12 +1,10 @@
-import { connection } from "next/server";
+import { Suspense } from "react";
+import { io } from "next/cache";
 import { listActiveTasks } from "@/lib/store";
 import { addTask } from "./actions";
 import Board from "@/components/board";
 
-export default async function Home() {
-  await connection(); // 关键：让页面在每次请求时都重新读数据文件，而不是构建时固化
-  const tasks = await listActiveTasks();
-
+export default function Home() {
   return (
     <main className="p-8 max-w-5xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">任务看板</h1>
@@ -31,7 +29,17 @@ export default async function Home() {
         </button>
       </form>
 
-      <Board tasks={tasks} />
+      <Suspense fallback={<p className="text-gray-400">加载中…</p>}>
+        <BoardSection />
+      </Suspense>
     </main>
   );
+}
+
+// 读数据的部分单独抽成异步组件，用 Suspense 包裹：
+// 页面其余部分（标题/表单）能预渲染成静态外壳，看板数据再流式进入
+async function BoardSection() {
+  await io(); // 让文件读取在请求时执行，不固化进静态外壳
+  const tasks = await listActiveTasks();
+  return <Board tasks={tasks} />;
 }
