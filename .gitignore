@@ -42,5 +42,3 @@ next-env.d.ts
 
 # local data (dev database)
 /data/
-
-start-dev.ps1
